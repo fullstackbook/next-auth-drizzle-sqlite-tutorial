@@ -7,9 +7,6 @@ import { eq } from "drizzle-orm";
 import { users } from "./schema";
 
 function passwordToSalt(password: string) {
-  if (!password) {
-    throw new Error("password invalid");
-  }
   const saltRounds = 10;
   const hash = bcrypt.hashSync(password, saltRounds);
   return hash;
@@ -19,7 +16,6 @@ async function getUserFromDb(username: string) {
   const user = await db.query.users.findFirst({
     where: eq(users.name, username),
   });
-
   return user;
 }
 
@@ -60,7 +56,7 @@ export const {
 
         if (user) {
           if (!user.password) {
-            throw new Error("Password not found.");
+            return null;
           }
 
           const isAuthenciated = await bcrypt.compare(password, user.password);
